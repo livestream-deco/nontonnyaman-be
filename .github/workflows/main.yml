@@ -48,6 +48,6 @@ jobs:
       name: Create GitHub deployment
       with:
         initial_status: success
-        token: ${{ github.token }}
+        token: ${{ secrets.GH_TOKEN }}
         target_url: https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com
         environment: production
