@@ -10,6 +10,7 @@ from .models import *
 import json
 from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 
 @csrf_exempt
 def flutter_register_user(request):
@@ -36,3 +37,43 @@ def flutter_user_login(request):
         if user:
             login(request, user)
             return JsonResponse({"session-id": request.session.session_key, "is_staff": False, "role_users": True, "email": user.email})
+
+@login_required
+def flutter_user_info(request):
+    if request.method == "GET":
+        user = request.user
+        if user.is_authenticated:
+            return JsonResponse({
+                "email": user.email,
+                "name": user.name,
+                "is_staff": user.is_staff,
+                "role_users": user.role_users,
+                "session-id": request.session.session_key,
+            })
+        else:
+            return HttpResponseForbidden("You are not authenticated")
+        
+@login_required
+def flutter_edit_user(request):
+    if request.method == "POST":
+        user = request.user
+        if user.is_authenticated:
+            data = request.body.decode('utf-8')
+            cleaned_data = json.loads(data)
+            if 'email' in cleaned_data:
+                user.email = cleaned_data['email']
+            if 'name' in cleaned_data:
+                user.name = cleaned_data['name']
+            if 'password' in cleaned_data:
+                user.set_password(cleaned_data['password'])
+            user.save()
+            return JsonResponse({
+                "message": "User information updated successfully.",
+                "email": user.email,
+                "name": user.name,
+                "is_staff": user.is_staff,
+                "role_users": user.role_users,
+                "session-id": request.session.session_key,
+            })
+        else:
+            return HttpResponseForbidden("You are not authenticated")
