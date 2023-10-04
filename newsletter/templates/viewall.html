@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>View All Newsletters</title>
+</head>
+<body>
+  <h1>All Newsletters</h1>
+  <ul>
+    {% for newsletter in newsletters %}
+      <li>
+        <!-- <h2>{{ newsletter.newsletter_title }}</h2>
+        <p>{{ newsletter.newsletter_text }}</p> -->
+        {% if newsletter.newsletter_picture %}
+        <h2>{{ newsletter.newsletter_picture }}</h2>
+        <img
+        alt="Newsletter Image"
+        src="{{newsletter.newsletter_picture.url}}"
+        class="absolute inset-0 h-full w-full object-cover"
+      />
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
