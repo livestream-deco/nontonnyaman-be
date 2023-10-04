@@ -33,6 +33,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = [ "*" ]
 
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
+AUTH_USER_MODEL = 'user.Account'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 # Application definition
 
@@ -45,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'newsletter',
 
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -75,6 +81,18 @@ TEMPLATES = [
         },
     },
 ]
+
+ALLOWED_HOSTS = ['localhost','127.0.0.1','10.0.2.2']
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+    "http://localhost:58701",
+    "http://10.0.2.2"
+]
+CORS_ALLOW_HEADERS = "*"
+CORS_ALLOW_ALL_ORIGINS = True
 
 WSGI_APPLICATION = 'nontonnyaman.wsgi.application'
 
