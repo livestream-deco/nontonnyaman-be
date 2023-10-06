@@ -59,7 +59,3 @@ def delete_newsletter(request,id):
         return HttpResponseRedirect("list/")
     
     return render(request, "delete_view.html", context)
-
-def newsletterhtmk(request):
-    obj=Newsletter.objects.all()
-    return render(request,'list.html',{"obj":obj})
