@@ -17,14 +17,7 @@ def add_newsletter(request):
         if context['form'].is_valid():
             context['form'].save()
             context['form'] = NewsletterForm()
-        return render(request, 'newsletter.html', context)   
-
-# def add_newsletter(request):
-#     if request.method ==  "POST":
-#         form = NewsletterForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return HttpResponseRedirect('add-newsletter/')
+        return render(request, 'newsletter.html', context)
 
 @csrf_exempt
 def view_detail_newsletter(request, input_id):
