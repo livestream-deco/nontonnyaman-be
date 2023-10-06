@@ -27,21 +27,15 @@ def add_newsletter(request):
 #             return HttpResponseRedirect('add-newsletter/')
 
 @csrf_exempt
-def view_detail_newsletter(request):
-    newsletter_id = request.GET.get('input_id')
-    print(newsletter_id)
-    newsletter_id2 = request.GET.get('id')
-    print(newsletter_id2)
-    newsletter = Newsletter.objects.get(id=newsletter_id)
+def view_detail_newsletter(request, input_id):
+    newsletter = Newsletter.objects.get(id=input_id)
     newsletter_list = []
-    print(newsletter.newsletter_picture.url)
     newsletter_list.append({
         'newsletter_id' : newsletter.id,
         'newsletter_title' : newsletter.newsletter_title,
         'newsletter_text': newsletter.newsletter_text,
         'newsletter_picture': json.dumps(str(newsletter.newsletter_picture.url)) if newsletter.newsletter_picture else None,
     })
-    print('masuk')
     data = json.dumps(newsletter_list)
     return HttpResponse(data, content_type='application/json')
 
