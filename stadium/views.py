@@ -14,8 +14,7 @@ def view_all_stadium(request):
     stadium = Stadium.objects.all()
         
     return render(request, 'stadium_list.html', 
-        {
-		'stadiums':stadium})
+        {'stadiums':stadium})
 
 def add_stadium(request):
     if require_http_methods(["POST"]):
