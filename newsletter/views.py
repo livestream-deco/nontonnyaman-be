@@ -35,20 +35,12 @@ def view_detail_newsletter(request, input_id):
 @csrf_exempt
 def view_all_newsletter(request):
     newsletters = Newsletter.objects.all()
-        
-    return render(request, 'viewall.html', 
-        {
-		'newsletters':newsletters})
+    return render(request, 'viewall.html', {'newsletters':newsletters})
 
 def delete_newsletter(request,id):
     context ={}
- 
-    # fetch the object related to passed id
-    obj = get_object_or_404(Newsletter, id = id)
- 
- 
+    obj = get_object_or_404(Newsletter, id = id) 
     if request.method =="POST":
         obj.delete()
-        return HttpResponseRedirect("list/")
-    
+        return HttpResponseRedirect("list/")   
     return render(request, "delete_view.html", context)
