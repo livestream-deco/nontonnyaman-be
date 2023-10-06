@@ -4,9 +4,7 @@ from stadium.forms import StadiumForm
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, JsonResponse
-
 from django.shortcuts import get_object_or_404, render,HttpResponseRedirect
-
 from stadium.models import Stadium
 
 
@@ -30,11 +28,8 @@ def add_stadium(request):
 
 def delete_stadium(request,id):
     context ={}
- 
     # fetch the object related to passed id
     obj = get_object_or_404(Stadium, id = id)
- 
- 
     if request.method =="POST":
         obj.delete()
         return HttpResponseRedirect("list/")
@@ -42,7 +37,7 @@ def delete_stadium(request,id):
     return render(request, "delete_stadium_view.html", context)
 
 @csrf_exempt
-def view_stadium_detail(request,input_id):
+def view_stadium_detail(input_id):
     stadium = Stadium.objects.get(id=input_id)
     stadium_list = []
     print(stadium.stadium_picture.url)
@@ -53,7 +48,6 @@ def view_stadium_detail(request,input_id):
         'stadium_picture': json.dumps(str(stadium.stadium_picture.url)) if stadium.stadium_picture else None,
         'stadium_map': json.dumps(str(stadium.stadium_map.url)) if stadium.stadium_map else None,
     })
-    print('masuk')
     data = json.dumps(stadium_list)
     return HttpResponse(data, content_type='application/json')
 
