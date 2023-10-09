@@ -82,14 +82,15 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','10.0.2.2']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','10.0.2.2',"nonton-nyaman-cbfc2703b99d.herokuapp.com"]
 CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "https://sub.example.com",
     "http://localhost:8080",
     "http://127.0.0.1:9000",
     "http://localhost:58701",
-    "http://10.0.2.2"
+    "http://10.0.2.2",
+    "nonton-nyaman-cbfc2703b99d.herokuapp.com"
 ]
 CORS_ALLOW_HEADERS = "*"
 CORS_ALLOW_ALL_ORIGINS = True
