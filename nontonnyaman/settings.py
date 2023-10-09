@@ -16,10 +16,11 @@ import os
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_URL = ''
+MEDIA_ROOT = ''
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -32,6 +33,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = [ "*" ]
 
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )
+AUTH_USER_MODEL = 'user.Account'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 # Application definition
 
@@ -42,6 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'newsletter',
+    'user',
+    'accomodationsuggestion',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +81,19 @@ TEMPLATES = [
         },
     },
 ]
+
+ALLOWED_HOSTS = ['localhost','127.0.0.1','10.0.2.2',"nonton-nyaman-cbfc2703b99d.herokuapp.com"]
+CORS_ALLOWED_ORIGINS = [
+    "https://example.com",
+    "https://sub.example.com",
+    "http://localhost:8080",
+    "http://127.0.0.1:9000",
+    "http://localhost:58701",
+    "http://10.0.2.2",
+    "nonton-nyaman-cbfc2703b99d.herokuapp.com"
+]
+CORS_ALLOW_HEADERS = "*"
+CORS_ALLOW_ALL_ORIGINS = True
 
 WSGI_APPLICATION = 'nontonnyaman.wsgi.application'
 
@@ -121,7 +143,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# for directory in [*STATICFILES_DIRS, STATIC_ROOT]:
+#     directory.mkdir(exist_ok=True)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

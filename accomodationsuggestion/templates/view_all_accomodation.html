@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>View All Accomodation</title>
+</head>
+<body>
+  <h1>All Accomodation</h1>
+  <ul>
+    {% for place in accomodation %}
+      <li>
+        {{ place.accomodation_name }}
+        {{ place.accomodation_description }}
+        {% if place.accomodation_picture %}
+        <h2>{{ place.accomodation_picture }}</h2>
+        <img
+        alt="Newsletter Image"
+        src="{{place.accomodation_picture.url}}"
+        class="absolute inset-0 h-full w-full object-cover"
+      />
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
