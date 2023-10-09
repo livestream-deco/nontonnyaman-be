@@ -35,7 +35,17 @@ def view_detail_newsletter(request, input_id):
 @csrf_exempt
 def view_all_newsletter(request):
     newsletters = Newsletter.objects.all()
-    return render(request, 'viewall.html', {'newsletters':newsletters})
+    
+    newsletter_list = []
+    for newsletter in newsletters:
+        newsletter_list.append({
+            'newsletter_title' : newsletter.newsletter_title,
+            'newsletter_text': newsletter.newsletter_text,
+            'newsletter_picture': json.dumps(str(newsletter.newsletter_picture.url)),
+        })
+        
+    data = json.dumps(newsletter_list)
+    return HttpResponse(data, content_type='application/json')
 
 def delete_newsletter(request,id):
     context ={}
