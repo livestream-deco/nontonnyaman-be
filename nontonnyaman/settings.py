@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'newsletter',
-
-    'user'
+    'user',
+    'accomodationsuggestion',
 ]
 
 MIDDLEWARE = [

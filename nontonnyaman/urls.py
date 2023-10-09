@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('newsletter/', include('newsletter.urls')),
     path('user/',include('user.urls')),
+    path('accomodationsuggestion/', include('accomodationsuggestion.urls'))
 ]
 
 if settings.DEBUG:
