@@ -50,4 +50,4 @@ jobs:
         initial_status: success
         token: ${{ secrets.GH_TOKEN }}
         target_url: https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com
-        environment: production
+        environment: staging
