@@ -35,7 +35,6 @@ def view_detail_newsletter(request, input_id):
 @csrf_exempt
 def view_all_newsletter(request):
     newsletters = Newsletter.objects.all()
-    
     newsletter_list = []
     for newsletter in newsletters:
         newsletter_list.append({
@@ -43,7 +42,6 @@ def view_all_newsletter(request):
             'newsletter_text': newsletter.newsletter_text,
             'newsletter_picture': json.dumps(str(newsletter.newsletter_picture.url)),
         })
-        
     data = json.dumps(newsletter_list)
     return HttpResponse(data, content_type='application/json')
 
