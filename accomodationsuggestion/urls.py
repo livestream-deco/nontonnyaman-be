@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
      path('add-accomodation/', add_accomodation),
-     path('detail-accomodation/<str:input_id>/', detail_accomodation),
+     path('detail-accomodation/', detail_accomodation),
      path('view-accomodation/', view_accomodation),
 
 ]
