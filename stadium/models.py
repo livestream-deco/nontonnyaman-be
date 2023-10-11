@@ -7,3 +7,11 @@ class Stadium(models.Model):
     stadium_picture = models.ImageField(upload_to='images/', blank=True, null=True)
     stadium_map_picture = models.ImageField(upload_to='images/', blank=True, null=True)
 
+class StadiumFeature(models.Model):
+    name = models.CharField(max_length=100)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    stadium = models.ForeignKey(Stadium, related_name='features', on_delete=models.CASCADE)
+
+
+

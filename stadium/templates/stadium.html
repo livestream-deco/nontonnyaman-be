@@ -7,19 +7,43 @@
     <title>Stadium</title>
 </head>
 <body>
-    <body>
-        {% block content %}
-        <div class="container">
-            <h1>Submit Form</h1>
-            <form action="" method="POST"  enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Submit</button>
-        </div>
-        
-      {% endblock %}  
-      
-      </body>
-      
+    {% block content %}
+    <div class="container">
+        <h1>Submit Form</h1>
+        <form action="" method="POST"  enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            {{ feature_formset.management_form }}
+            <div id="featureForms">
+                {% for feature_form in feature_formset %}
+                    <div class="featureForm">{{ feature_form.as_p }}</div>
+                {% endfor %}
+            </div>
+            <button type="button" id="addFeature">Add another feature</button>
+            <button type="submit">Submit</button>
+        </form>     
+    </div>
+    {% endblock %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    var totalForms = $('#id_features-TOTAL_FORMS');
+    var maxForms = $('#id_features-MAX_NUM_FORMS');
+    var addFeatureButton = $('#addFeature');
+    var featureForms = $('#featureForms');
+
+    addFeatureButton.click(function() {
+        var numForms = featureForms.children().length;
+        if (numForms < maxForms.val()) {
+            var newFormHtml = featureForms.children().first()[0].outerHTML;
+            var re = new RegExp('features-0', 'g');
+            newFormHtml = newFormHtml.replace(re, 'features-' + numForms);
+            featureForms.append(newFormHtml);
+            totalForms.val(numForms + 1);
+        }
+        return false;
+    });
+});
+</script>
 </body>
 </html>
