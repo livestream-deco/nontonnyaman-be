@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
      path('add-stadium/', add_stadium),
-     path('view-detail-stadium/<str:input_id>', view_detail_stadium),
+     path('view-detail-stadium/', view_detail_stadium),
      path('view-all-stadium/', view_all_stadium),
 
 
