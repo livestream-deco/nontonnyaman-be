@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'newsletter',
     'user',
     'accomodationsuggestion',
+    'stadium',
 ]
 
 MIDDLEWARE = [

@@ -39,6 +39,7 @@ def view_all_newsletter(request):
     newsletter_list = []
     for newsletter in newsletters:
         newsletter_list.append({
+            'newsletter_id' : newsletter.id,
             'newsletter_title' : newsletter.newsletter_title,
             'newsletter_text': newsletter.newsletter_text,
             'newsletter_picture': json.dumps(str(newsletter.newsletter_picture.url)),
