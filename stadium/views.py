@@ -20,8 +20,9 @@ def add_stadium(request):
         return render(request, 'stadium.html', context)
 
 @csrf_exempt
-def view_detail_stadium(request,input_id):
-    stadium = Stadium.objects.get(id=input_id)
+def view_detail_stadium(request):
+    stadium_id = request.GET.get('input_id')
+    stadium = Stadium.objects.get(id=stadium_id)
     stadium_list = []
     stadium_list.append({
         'stadium_id' : stadium.id,
