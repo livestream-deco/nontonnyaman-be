@@ -27,9 +27,8 @@ def detail_accomodation(request, input_id):
         'accomodation_price': accomodation.accomodation_price,
         'accomodation_picture': json.dumps(str(accomodation.accomodation_picture.url)) if accomodation.accomodation_picture else None,
     })
-    print(accomodation_list)
     data = json.dumps(accomodation_list)
-    return render(request, 'view_detail_accomodation.html', {'accomodation': accomodation_list})
+    return HttpResponse(data, content_type='application/json')
 
 @csrf_exempt
 def view_accomodation(request):
