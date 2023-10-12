@@ -45,7 +45,6 @@ def view_all_newsletter(request):
             'newsletter_text': newsletter.newsletter_text,
             'newsletter_picture': json.dumps(str(newsletter.newsletter_picture.url)),
         })
-        
     data = json.dumps(newsletter_list)
     return HttpResponse(data, content_type='application/json')
 
