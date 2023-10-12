@@ -1,5 +1,6 @@
-from stadium.models import Stadium
+from stadium.models import Stadium,StadiumFeature
 from django import forms
+from django.forms.models import inlineformset_factory
 
 
 class StadiumForm(forms.ModelForm):
@@ -22,3 +23,12 @@ class StadiumForm(forms.ModelForm):
                 'max_length': 'The text is too long',
             },
         }
+
+class FeatureForm(forms.ModelForm):
+    class Meta:
+        model = StadiumFeature
+        fields = ('name', 'latitude', 'longitude')
+
+FeatureFormSet = inlineformset_factory(
+    Stadium, StadiumFeature, form=FeatureForm, extra=1, can_delete=True
+)
