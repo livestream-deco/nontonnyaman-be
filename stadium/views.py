@@ -56,7 +56,7 @@ def view_detail_stadium(request):
     #     'stadium_picture': str(stadium.stadium_picture.url) if stadium.stadium_picture else None,
     #     'stadium_map_picture': str(stadium.stadium_map_picture.url) if stadium.stadium_map_picture else None,
     # }    
-
+    print(stadium_data["stadium_map_picture"])
     features_data = []
     for feature in stadium.features.all():
         features_data.append({
@@ -90,12 +90,11 @@ def view_all_stadium(request):
             'stadium_name': stadium.stadium_name,
             'stadium_location': stadium.stadium_name,
             'stadium_text': stadium.stadium_text,
-            'stadium_picture': str(stadium.stadium_picture.url) if stadium.stadium_picture else None,
-            'stadium_map_picture': str(stadium.stadium_map_picture.url) if stadium.stadium_map_picture else None,
+            'stadium_picture': json.dumps(str(stadium.stadium_picture.url)) if stadium.stadium_picture else None,
+            'stadium_map_picture': json.dumps(str(stadium.stadium_map_picture.url)) if stadium.stadium_map_picture else None,
             'features': features_data,
         }
         stadium_list.append(stadium_data)
-
     data = json.dumps(stadium_list)
     return HttpResponse(data, content_type='application/json')
 
