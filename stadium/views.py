@@ -106,27 +106,7 @@ def delete_stadium(request,id):
         obj.delete()
         return HttpResponseRedirect("list/")   
     return render(request, "delete_view.html", context)
-
-def staff_list(request, stadium_id):
-    stadium_id = request.GET.get('input_id')
-    selected_stadium = Stadium.objects.get(id=stadium_id)
     
-    if selected_stadium:
-        staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
-    else:
-        staff_list = Account.objects.filter(is_staff=True)
-    
-    stadiums = Stadium.objects.all()
-    
-    context = {
-        'staff_list': staff_list,
-        'selected_stadium': selected_stadium,
-        'stadiums': stadiums,
-    }
-    
-    return render(request, 'staff_list.html', context)
-
-
 def choose_stadium(request):
     stadiums = Stadium.objects.all()
     
@@ -139,7 +119,8 @@ def choose_stadium(request):
     }
     
     return render(request, 'choose_stadium.html', context)
-
+    
+@csrf_exempt
 def staff_list(request):
     stadium_id = request.GET.get('input_id')
     selected_stadium = Stadium.objects.get(id=stadium_id)
