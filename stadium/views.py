@@ -108,7 +108,8 @@ def delete_stadium(request,id):
     return render(request, "delete_view.html", context)
 
 def staff_list(request, stadium_id):
-    selected_stadium = Stadium.objects.filter(id=stadium_id).first()
+    stadium_id = request.GET.get('input_id')
+    selected_stadium = Stadium.objects.get(id=stadium_id)
     
     if selected_stadium:
         staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
