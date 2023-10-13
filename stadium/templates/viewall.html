@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>View All Stadium</title>
+</head>
+<body>
+  <h1>All Stadium</h1>
+  <ul>
+    {% for stadium in stadiums %}
+      <li>
+        <!-- <h2>{{ newsletter.newsletter_title }}</h2>
+        <p>{{ newsletter.newsletter_text }}</p> -->
+        {% if stadium.stadium_picture %}
+        <h2>{{ stadium.stadium_picture }}</h2>
+        <img
+        alt="Stadium Image"
+        src="{{stadium.stadium_picture.url}}"
+        class="absolute inset-0 h-full w-full object-cover"
+      />
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

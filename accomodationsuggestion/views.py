@@ -18,7 +18,8 @@ def add_accomodation(request):
 
 @csrf_exempt
 def detail_accomodation(request, input_id):
-    accomodation = Accomodation.objects.get(id=input_id)
+    accomodatio_id = request.GET.get('input_id')
+    accomodation = Accomodation.objects.get(id=accomodatio_id)
     accomodation_list = []
     accomodation_list.append({
         'accomodation_id' : accomodation.id,

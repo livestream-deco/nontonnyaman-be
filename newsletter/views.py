@@ -20,8 +20,9 @@ def add_newsletter(request):
         return render(request, 'newsletter.html', context)
 
 @csrf_exempt
-def view_detail_newsletter(request, input_id):
-    newsletter = Newsletter.objects.get(id=input_id)
+def view_detail_newsletter(request):
+    newsletter_id = request.GET.get('input_id')
+    newsletter = Newsletter.objects.get(id=newsletter_id)
     newsletter_list = []
     newsletter_list.append({
         'newsletter_id' : newsletter.id,
@@ -39,11 +40,11 @@ def view_all_newsletter(request):
     newsletter_list = []
     for newsletter in newsletters:
         newsletter_list.append({
+            'newsletter_id' : newsletter.id,
             'newsletter_title' : newsletter.newsletter_title,
             'newsletter_text': newsletter.newsletter_text,
             'newsletter_picture': json.dumps(str(newsletter.newsletter_picture.url)),
         })
-        
     data = json.dumps(newsletter_list)
     return HttpResponse(data, content_type='application/json')
 

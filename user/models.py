@@ -1,9 +1,7 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 import datetime
+from stadium.models import Stadium
 
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, password=None):
@@ -25,12 +23,15 @@ class MyAccountManager(BaseUserManager):
         user.is_staff = True
         user.save(using=self._db)
         return user
+
 class Account(AbstractBaseUser):
-    email = models.CharField(max_length=20,primary_key=True, blank=True)
-    name = models.CharField(max_length = 40, blank = True)
+    email = models.CharField(max_length=20, primary_key=True, blank=True)
+    name = models.CharField(max_length=40, blank=True)
     date = models.DateField(("Date"), default=datetime.date.today)
-    is_staff = models.BooleanField(default=False)
-    role_users = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)  # Identifies staff members
+    stadium = models.ForeignKey(Stadium, related_name='staff', on_delete=models.SET_NULL, null=True, blank=True)
+    # Add other common user fields as needed
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     
@@ -44,3 +45,21 @@ class Account(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+class StaffProfile(models.Model):
+    user = models.OneToOneField(Account, on_delete=models.CASCADE)
+    staff_id = models.CharField(max_length=10, unique=True)
+    department = models.CharField(max_length=40)
+    is_available = models.BooleanField(default=True)  # Attribute for availability
+
+    def __str__(self):
+        return self.user.email
+
+class AssistanceRequest(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    staff = models.ForeignKey(StaffProfile, on_delete=models.SET_NULL, null=True, blank=True)
+    request_message = models.TextField()
+    # Add timestamp or other fields as needed
+
+    def __str__(self):
+        return f"Assistance request from {self.user.email}"

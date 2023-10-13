@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'newsletter',
     'user',
     'accomodationsuggestion',
+    'stadium',
 ]
 
 MIDDLEWARE = [
@@ -82,7 +83,7 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','10.0.2.2',"nonton-nyaman-cbfc2703b99d.herokuapp.com"]
+ALLOWED_HOSTS = ['localhost','127.0.0.1','10.0.2.2',"nonton-nyaman-cbfc2703b99d.herokuapp.com","localhost:64990"]
 CORS_ALLOWED_ORIGINS = [
     "https://example.com",
     "https://sub.example.com",
@@ -90,6 +91,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:9000",
     "http://localhost:58701",
     "http://10.0.2.2",
+    "http://localhost:64990"
     "nonton-nyaman-cbfc2703b99d.herokuapp.com"
 ]
 CORS_ALLOW_HEADERS = "*"
