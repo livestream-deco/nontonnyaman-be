@@ -134,7 +134,6 @@ def staff_list(request):
     staff_info_list = []
     for staff in staff_list:
         staff_info_list.append({
-            'staff_id': staff.id,
             'name': staff.name,
             'email': staff.email,
             'stadium_name': staff.stadium.stadium_name if staff.stadium else None,
