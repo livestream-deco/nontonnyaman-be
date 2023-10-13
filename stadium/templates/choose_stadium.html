@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Choose a Stadium</title>
+</head>
+<body>
+    <h1>Choose a Stadium</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="stadium">Select a Stadium:</label>
+        <select name="stadium" id="stadium">
+            <option value="">Select a Stadium</option>
+            {% for stadium in stadiums %}
+                <option value="{{ stadium.id }}">{{ stadium.stadium_name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Choose Stadium">
+    </form>
+</body>
+</html>

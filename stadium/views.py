@@ -1,9 +1,10 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from stadium.forms import StadiumForm,FeatureForm
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from stadium.models import Stadium,StadiumFeature
+from user.models import Account
 from django.http import HttpResponse, JsonResponse
 from django.forms.models import inlineformset_factory
 
@@ -105,3 +106,59 @@ def delete_stadium(request,id):
         obj.delete()
         return HttpResponseRedirect("list/")   
     return render(request, "delete_view.html", context)
+
+def staff_list(request, stadium_id):
+    selected_stadium = Stadium.objects.filter(id=stadium_id).first()
+    
+    if selected_stadium:
+        staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
+    else:
+        staff_list = Account.objects.filter(is_staff=True)
+    
+    stadiums = Stadium.objects.all()
+    
+    context = {
+        'staff_list': staff_list,
+        'selected_stadium': selected_stadium,
+        'stadiums': stadiums,
+    }
+    
+    return render(request, 'staff_list.html', context)
+
+
+def choose_stadium(request):
+    stadiums = Stadium.objects.all()
+    
+    if request.method == 'POST':
+        selected_stadium_id = request.POST.get('stadium')
+        return redirect('staff_list', stadium_id=selected_stadium_id)
+    
+    context = {
+        'stadiums': stadiums,
+    }
+    
+    return render(request, 'choose_stadium.html', context)
+
+def staff_list(request):
+    stadium_id = request.GET.get('input_id')
+    selected_stadium = Stadium.objects.get(id=stadium_id)
+    
+    if selected_stadium:
+        staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
+    else:
+        staff_list = Account.objects.filter(is_staff=True)
+    
+    # Create a list of dictionaries containing staff information
+    staff_info_list = []
+    for staff in staff_list:
+        staff_info_list.append({
+            'staff_id': staff.id,
+            'name': staff.name,
+            'email': staff.email,
+            'stadium_name': staff.stadium.stadium_name if staff.stadium else None,
+        })
+    
+    data = json.dumps(staff_info_list)
+    return HttpResponse(data, content_type='application/json')
+
+

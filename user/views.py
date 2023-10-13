@@ -10,6 +10,10 @@ from .models import *
 import json
 from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth import login
+from django.shortcuts import render, redirect
+from .models import Account
+from stadium.models import Stadium
+from .forms import StaffAddForm  # Create this form in forms.py
 
 @csrf_exempt
 def flutter_register_user(request):
@@ -36,3 +40,29 @@ def flutter_user_login(request):
         if user:
             login(request, user)
             return JsonResponse({"session-id": request.session.session_key, "is_staff": False, "role_users": True, "email": user.email})
+
+def add_staff(request):
+    if request.method == 'POST':
+        form = StaffAddForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            name = form.cleaned_data['name']
+            stadium_id = form.cleaned_data['stadium']
+            is_staff = form.cleaned_data['is_staff']
+
+            # Create a new staff member
+            staff = Account.objects.create(email=email, name=name, is_staff=is_staff)
+            if is_staff:
+                # Associate the staff member with a stadium
+                staff.stadium_id = stadium_id
+                staff.save()
+            
+            return redirect('staff_list')  # Redirect to a staff list view or another page
+    else:
+        form = StaffAddForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'add_staff.html', context)
+

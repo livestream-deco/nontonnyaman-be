@@ -24,7 +24,7 @@ urlpatterns = [
     path('newsletter/', include('newsletter.urls')),
     path('user/',include('user.urls')),
     path('accomodationsuggestion/', include('accomodationsuggestion.urls')),
-    path('stadium/', include('stadium.urls'))
+    path('stadium/', include('stadium.urls')),
 ]
 
 if settings.DEBUG:

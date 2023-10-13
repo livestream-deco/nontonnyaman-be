@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Available Staff Members</title>
+</head>
+<body>
+    <h1>Available Staff Members</h1>
+
+    <form method="get">
+        <label for="stadium">Select a Stadium:</label>
+        <select name="stadium" id="stadium">
+            <option value="">All Stadiums</option>
+            {% for stadium in stadiums %}
+                <option value="{{ stadium.id }}">{{ stadium.stadium_name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Filter Staff">
+    </form>
+
+    <ul>
+        {% for staff_member in staff_list %}
+            <li>{{ staff_member.name }} ({{ staff_member.email }}) - Stadium: {{ staff_member.stadium.stadium_name }}</li>
+        {% empty %}
+            <li>No available staff members found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
