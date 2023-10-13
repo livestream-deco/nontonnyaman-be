@@ -8,7 +8,7 @@ urlpatterns = [
      path('view-detail-stadium/', view_detail_stadium),
      path('view-all-stadium/', view_all_stadium),
      path('choose-stadium/', choose_stadium, name='choose_stadium'),
-     path('staff-list/<int:stadium_id>/', staff_list, name='staff_list'),
+     path('staff-list/', staff_list, name='staff_list'),
 
 
 ]
