@@ -13,7 +13,7 @@ from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from .models import Account
 from stadium.models import Stadium
-from .forms import StaffAddForm  # Create this form in forms.py
+from .forms import StaffRegistrationForm, StaffListForm, StaffChoiceForm  # Create this form in forms.py
 
 @csrf_exempt
 def flutter_register_user(request):
@@ -41,32 +41,65 @@ def flutter_user_login(request):
             login(request, user)
             return JsonResponse({"session-id": request.session.session_key, "is_staff": False, "role_users": True, "email": user.email})
         
-@csrf_exempt
-def add_staff(request):
+        
+def list_staff(request):
+    stadium_id = request.GET.get('input_id')
+    stadiums = Stadium.objects.get(id=2)
+    list_staff = []
+    staff = StaffProfile.objects.filter(stadium=stadiums, is_available=True)
+    for i in staff:
+        list_staff.append({
+            'staff_id': i.staff_id,
+            'department': i.department,
+            'is_available': i.is_available,
+            'phone_number': i.phone_number,
+            'stadium': i.stadium.stadium_name,
+            'user': i.user.email,
+        })
+    data = json.dumps(list_staff)
+    return JsonResponse(data, safe=False)
+
+def register_staff(request):
     if request.method == 'POST':
-        form = StaffAddForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            name = form.cleaned_data['name']
-            password = form.cleaned_data['password']  # Add password field to the form
-            stadium_id = form.cleaned_data['stadium']
-            is_staff = form.cleaned_data['is_staff']
+        staff_form = StaffRegistrationForm(request.POST)
 
-            # Create a new staff member
-            staff = Account.objects.create(email=email, name=name, is_staff=is_staff)
-            staff.set_password(password)  # Set the password
-            if is_staff:
-                # Associate the staff member with a stadium
-                staff.stadium_id = stadium_id
-            staff.save()
+        if staff_form.is_valid():
+            staff_form.save()
 
-            return redirect('staff_list')  # Redirect to a staff list view or another page
+            # Optionally, set the 'has_chose' attribute to True for the associated Account
+            selected_user = staff_form.cleaned_data['user']
+            selected_user.has_chose = True
+            selected_user.save()
+
+            return redirect('staff_list')  # Redirect to the staff list or a success page
     else:
-        form = StaffAddForm()
+        staff_form = StaffRegistrationForm()
 
-    context = {
-        'form': form,
-    }
-    return render(request, 'add_staff.html', context)
+    return render(request, 'register_staff.html', {'staff_form': staff_form})
 
+def choose_staff(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    user = Account.objects.get(email = email)
+    staff = StaffProfile.objects.get(user = user)
+    staff = StaffAssistant.objects.create(user = user, staff = staff)
+    user.staff_assistant = staff
+    user.save()
+    staff.is_available = False
+    staff.save()
+    return JsonResponse({'isSuccessful':True},safe = False)
+
+def check_list(request):
+    staffassistant = Account.objects.get(email = "aldi8@gmail.com")
+    staff = StaffAssistant.objects.filter(staff = staffassistant )
+    list_staff = []
+    for i in staff.user:
+        list_staff.append({
+            i
+        })
+    data = json.dumps(list_staff)
+    return JsonResponse(data, safe=False)
 

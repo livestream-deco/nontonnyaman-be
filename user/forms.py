@@ -1,9 +1,28 @@
 from django import forms
-from .models import Stadium
+from .models import StaffProfile
+from stadium.models import Stadium
 
-class StaffAddForm(forms.Form):
-    email = forms.EmailField(label='Email')
-    name = forms.CharField(max_length=100, label='Name')
-    password = forms.CharField(max_length=100, widget=forms.PasswordInput, label='Password')
-    stadium = forms.ModelChoiceField(queryset=Stadium.objects.all(), empty_label='Select a Stadium', label='Stadium')
-    is_staff = forms.BooleanField(initial=True, required=False, label='Is Staff Member')
+class StaffRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = StaffProfile
+        fields = ['user', 'staff_id', 'department', 'is_available', 'phone_number','stadium']
+
+class StaffListForm(forms.Form):
+    staff_member = forms.ModelChoiceField(
+        queryset=StaffProfile.objects.all(),
+        empty_label='Select a staff member',
+    )
+    stadium = forms.ModelChoiceField(
+        queryset=Stadium.objects.all(),
+        empty_label='Select a stadium',
+    )
+
+class StaffChoiceForm(forms.Form):
+    stadium = forms.ModelChoiceField(
+        queryset=Stadium.objects.all(),
+        empty_label='Select a stadium',
+    )
+    staff_choices = forms.ModelMultipleChoiceField(
+        queryset=StaffProfile.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+    )

@@ -1,0 +1,6 @@
+<form method="post">
+    {% csrf_token %}
+    {{ form.stadium }}
+    {{ form.staff_choices.as_ul }}
+    <button type="submit">Choose Staff</button>
+</form>

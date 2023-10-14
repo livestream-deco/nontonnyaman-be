@@ -1,0 +1,35 @@
+<!-- list_staff.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List Staff</title>
+</head>
+<body>
+    <h1>List Staff</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.staff_member }}
+        {{ form.stadium }}
+        <button type="submit">Assign Stadium</button>
+    </form>
+
+    <ul>
+        {% for staff_member in staff_members %}
+            <li>
+                <strong>{{ staff_member.user.name }}</strong> ({{ staff_member.user.email }})
+                <br>
+                Staff ID: {{ staff_member.staff_id }}
+                <br>
+                Department: {{ staff_member.department }}
+                <br>
+                Availability: {{ staff_member.is_available }}
+                <br>
+                Phone Number: {{ staff_member.phone_number }}
+            </li>
+        {% empty %}
+            <li>No staff members found.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
