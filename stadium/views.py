@@ -141,5 +141,3 @@ def staff_list(request):
     
     data = json.dumps(staff_info_list)
     return HttpResponse(data, content_type='application/json')
-
-
