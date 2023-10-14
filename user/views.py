@@ -103,3 +103,43 @@ def check_list(request):
     data = json.dumps(list_staff)
     return JsonResponse(data, safe=False)
 
+
+def flutter_user_info(request):
+    if request.method == "GET":
+        user = request.user
+        if user.is_authenticated:
+            return JsonResponse({
+                "email": user.email,
+                "name": user.name,
+                "is_staff": user.is_staff,
+                "role_users": user.role_users,
+                "session-id": request.session.session_key,
+            })
+        else:
+            return HttpResponseForbidden("You are not authenticated")
+        
+
+def flutter_edit_user(request):
+    if request.method == "POST":
+        user = request.user
+        if user.is_authenticated:
+            data = request.body.decode('utf-8')
+            cleaned_data = json.loads(data)
+            if 'email' in cleaned_data:
+                user.email = cleaned_data['email']
+            if 'name' in cleaned_data:
+                user.name = cleaned_data['name']
+            if 'password' in cleaned_data:
+                user.set_password(cleaned_data['password'])
+            user.save()
+            return JsonResponse({
+                "message": "User information updated successfully.",
+                "email": user.email,
+                "name": user.name,
+                "is_staff": user.is_staff,
+                "role_users": user.role_users,
+                "session-id": request.session.session_key,
+            })
+        else:
+            return HttpResponseForbidden("You are not authenticated")
+
