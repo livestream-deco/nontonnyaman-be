@@ -6,7 +6,8 @@ urlpatterns = [
      path('register-staff/', register_staff, name='add_staff'),
      path('list_staff/', list_staff, name='list_staff'),
      path('choose_staff/', choose_staff, name='choose_staff'),
+     path('user_info/', flutter_user_info, name='user_info'),
+     path('edit_user/', flutter_edit_user, name='edit_user'),
      path('staff-detail/',staff_detail),
      path('user-info/',flutter_get_user_info),
-
 ]
