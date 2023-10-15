@@ -1,6 +1,6 @@
 from django.urls import path
 
-from stadium.views import add_stadium,view_all_stadium, view_detail_stadium,staff_list,choose_stadium
+from stadium.views import add_stadium,view_all_stadium, view_detail_stadium,staff_list,choose_stadium, pick_staff
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
@@ -10,6 +10,7 @@ urlpatterns = [
      path('choose-stadium/', choose_stadium, name='choose_stadium'),
      path('staff-list/', staff_list, name='staff_list'),
       path('staff-list2/', staff_list, name='staff_list2'),
+      path('pick-staff/', pick_staff,name='pick_staff')
 
 
 

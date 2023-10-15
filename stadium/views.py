@@ -1,12 +1,15 @@
+from importlib import import_module
 import json
 from django.shortcuts import render,redirect
 from stadium.forms import StadiumForm,FeatureForm
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from stadium.models import Stadium,StadiumFeature
-from user.models import Account
+from user.models import *
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.forms.models import inlineformset_factory
+
 
 from django.shortcuts import get_object_or_404, render,HttpResponseRedirect
 FeatureFormSet = inlineformset_factory(
@@ -106,7 +109,27 @@ def delete_stadium(request,id):
         obj.delete()
         return HttpResponseRedirect("list/")   
     return render(request, "delete_view.html", context)
+
+def staff_list(request, stadium_id):
+    stadium_id = request.GET.get('input_id')
+    selected_stadium = Stadium.objects.get(id=stadium_id)
     
+    if selected_stadium:
+        staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
+    else:
+        staff_list = Account.objects.filter(is_staff=True)
+    
+    stadiums = Stadium.objects.all()
+    
+    context = {
+        'staff_list': staff_list,
+        'selected_stadium': selected_stadium,
+        'stadiums': stadiums,
+    }
+    
+    return render(request, 'staff_list.html', context)
+
+
 def choose_stadium(request):
     stadiums = Stadium.objects.all()
     
@@ -119,8 +142,7 @@ def choose_stadium(request):
     }
     
     return render(request, 'choose_stadium.html', context)
-    
-@csrf_exempt
+
 def staff_list(request):
     stadium_id = request.GET.get('input_id')
     selected_stadium = Stadium.objects.get(id=stadium_id)
@@ -134,6 +156,7 @@ def staff_list(request):
     staff_info_list = []
     for staff in staff_list:
         staff_info_list.append({
+            'staff_id': staff.id,
             'name': staff.name,
             'email': staff.email,
             'stadium_name': staff.stadium.stadium_name if staff.stadium else None,
@@ -141,3 +164,22 @@ def staff_list(request):
     
     data = json.dumps(staff_info_list)
     return HttpResponse(data, content_type='application/json')
+
+@csrf_exempt
+def pick_staff(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    owninguser = Account.objects.get(email = email)
+    staff_id = request.GET.get('input_id')
+    staff = StaffProfile.objects.get(staff_id = staff_id)
+    staff.is_available = False
+    staffAssistant = StaffAssistant.objects.create(user=owninguser, staff=staff)
+    staffAssistant.save()
+    staff.save()
+    return JsonResponse({'isSuccessful':True},safe = False)
+
+
+
