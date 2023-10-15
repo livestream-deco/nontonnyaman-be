@@ -45,7 +45,7 @@ class Account(AbstractBaseUser):
 
 class StaffProfile(models.Model):
     user = models.OneToOneField(Account, on_delete=models.CASCADE)
-    staff_id = models.CharField(max_length=10, unique=True)
+    staff_id = models.AutoField(primary_key=True)
     department = models.CharField(max_length=40)
     is_available = models.BooleanField(default=True)  # Attribute for availability
     phone_number = models.CharField(max_length=10, blank=False)
