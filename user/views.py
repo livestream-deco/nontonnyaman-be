@@ -20,7 +20,7 @@ def flutter_register_user(request):
     if request.method == "POST":
         raw = request.body.decode('utf-8')
         cleaned = json.loads(raw)
-        register_user = Account.objects.create(role_users=True, email=cleaned["email"], name = cleaned["name"])
+        register_user = Account.objects.create(email=cleaned["email"], name = cleaned["name"])
         register_user.set_password(cleaned["password"])
         try:
             register_user.save()
@@ -41,10 +41,10 @@ def flutter_user_login(request):
             login(request, user)
             return JsonResponse({"session-id": request.session.session_key, "is_staff": False, "role_users": True, "email": user.email})
         
-        
+@csrf_exempt
 def list_staff(request):
     stadium_id = request.GET.get('input_id')
-    stadiums = Stadium.objects.get(id=2)
+    stadiums = Stadium.objects.get(id=stadium_id)
     list_staff = []
     staff = StaffProfile.objects.filter(stadium=stadiums, is_available=True)
     for i in staff:
@@ -57,7 +57,7 @@ def list_staff(request):
             'user': i.user.email,
         })
     data = json.dumps(list_staff)
-    return JsonResponse(data, safe=False)
+    return HttpResponse(data, content_type='application/json')
 
 def register_staff(request):
     if request.method == 'POST':
@@ -102,4 +102,36 @@ def check_list(request):
         })
     data = json.dumps(list_staff)
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def staff_detail(request):
+    staff_id = request.GET.get('input_id')
+    staff = StaffProfile.objects.get(staff_id = staff_id)
+    staff_detail = []
+    staff_detail.append({
+        'staff_id': staff_id,
+        'department': staff.department,
+        'is_available': staff.is_available,
+        'phone_number': staff.phone_number,
+        'stadium': staff.stadium.stadium_name,
+        'user': staff.user.email,
+    })
+    data = json.dumps(staff_detail)
+    return HttpResponse(data, content_type='application/json')
+
+@csrf_exempt
+def flutter_get_user_info(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    user = Account.objects.get(email=email)
+    response_data = {
+        "session-id": request.session.session_key,
+        "email": user.email,
+        "name": user.name
+    }
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
