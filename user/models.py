@@ -24,7 +24,9 @@ class Account(AbstractBaseUser):
     email = models.CharField(max_length=20, primary_key=True, blank=True)
     name = models.CharField(max_length=40, blank=True)
     date = models.DateField(("Date"), default=datetime.date.today)
-    is_staff = models.BooleanField(default=False)  # Identifies staff members
+    is_staff = models.BooleanField(default=False) 
+    disability = models.CharField(max_length = 30, blank = False)
+    image = models.ImageField(upload_to='images/',blank=True, null=True)
     has_chose = models.BooleanField(default=False)  # Identifies if the user has chosen a staff
     stadium = models.ForeignKey(Stadium, related_name='staff', on_delete=models.SET_NULL, null=True, blank=True)
     staff_assistant = models.OneToOneField('StaffAssistant', on_delete=models.SET_NULL, null=True, blank=True)

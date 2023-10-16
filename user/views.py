@@ -14,20 +14,63 @@ from django.shortcuts import render, redirect
 from .models import Account
 from stadium.models import Stadium
 from .forms import StaffRegistrationForm, StaffListForm, StaffChoiceForm  # Create this form in forms.py
+from django.core.files.storage import default_storage
+
+@csrf_exempt
+def end_task(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    user = Account.objects.get(email=email)
+    staffUser = StaffProfile.objects.get(user=user)
+    staffConfirm = StaffAssistant.objects.get(staff=staffUser)
+    staffConfirm.user.has_chose = False
+    staffUser.is_available = True
+    staffUser.save()
+    staffConfirm.user.save()
+    staffConfirm.delete()
+    return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
 
 @csrf_exempt
 def flutter_register_user(request):
     if request.method == "POST":
-        raw = request.body.decode('utf-8')
-        cleaned = json.loads(raw)
-        register_user = Account.objects.create(email=cleaned["email"], name = cleaned["name"])
-        register_user.set_password(cleaned["password"])
         try:
+            email = request.POST.get('email')
+            password = request.POST.get('password')
+            name = request.POST.get('name')
+            disability = request.POST.get('disability')
+            image = request.FILES.get('image')
+            # You need to handle the image data appropriately based on your setup
+            # Here, I'm saving the uploaded file to Django's default storage
+            # and using its path to create the Account
+            file_path = default_storage.save(image.name, image)
+            image = request.FILES.get('image')
+            if image is not None:
+                file_path = default_storage.save(image.name, image)
+            else:
+                file_path = None 
+
+            
+            register_user = Account.objects.create(email=email, name=name, disability=disability,image = file_path)
+            register_user.set_password(password)
             register_user.save()
-        except:
-            return HttpResponse(status=409)
-        login(request, register_user)
-        return JsonResponse({"session-id": request.session.session_key,"is_staff": False, "role_users": True, "email": register_user.email, "name": register_user.name})
+
+            login(request, register_user)
+
+            return JsonResponse({
+                "session-id": request.session.session_key,
+                "is_staff": False, 
+                "role_users": True, 
+                "email": register_user.email, 
+                "name": register_user.name, 
+                "disability" : register_user.disability,
+                "image": file_path
+            })
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
 @csrf_exempt
 def flutter_user_login(request):
@@ -37,9 +80,22 @@ def flutter_user_login(request):
         email = cleaned_data["email"]
         password = cleaned_data["password"]
         user = authenticate(request, email=email, password=password)
-        if user:
+        
+        if user is not None:
             login(request, user)
-            return JsonResponse({"session-id": request.session.session_key, "is_staff": False, "role_users": True, "email": user.email})
+            is_staff = StaffProfile.objects.filter(user=user).exists()
+            
+            return JsonResponse({
+                "session-id": request.session.session_key, 
+                "is_staff": is_staff, 
+                "role_users": True, 
+                "email": user.email
+            })
+
+        else:
+            return JsonResponse({"error": "Invalid login credentials"})
+        
+
         
 @csrf_exempt
 def list_staff(request):
@@ -101,7 +157,7 @@ def check_list(request):
             i
         })
     data = json.dumps(list_staff)
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False)        
 
 @csrf_exempt
 def staff_detail(request):
@@ -120,6 +176,23 @@ def staff_detail(request):
     return HttpResponse(data, content_type='application/json')
 
 @csrf_exempt
+def flutter_user_info(request):
+    emails = request.GET.get('email')
+    user = Account.objects.get(email=emails)
+    listkosong = []
+    response_data = {
+        "email": user.email,
+        "name": user.name,
+        "disability" : user.disability,
+        'user_picture': json.dumps(str(user.image.url)) if user.image.url else None,
+        "has_chose" : user.has_chose,
+    }
+    listkosong.append(response_data)
+    data = json.dumps(listkosong)
+
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
 def flutter_get_user_info(request):
     session_id = request.GET.get('session_id')
     engine = import_module(settings.SESSION_ENGINE)
@@ -127,11 +200,119 @@ def flutter_get_user_info(request):
     session = sessionstore(session_id)
     email = session.get('_auth_user_id')
     user = Account.objects.get(email=email)
-    response_data = {
+    listkosong = []
+    if (user.staff_assistant):
+        staff = user.staff_assistant.staff
+        response_data = {
         "session-id": request.session.session_key,
         "email": user.email,
-        "name": user.name
-    }
+        "name": user.name,
+        "disability" : user.disability,
+        'user_picture': json.dumps(str(user.image.url)) if user.image.url else None,
+        "has_chose" : user.has_chose,
+        "staff_email" : staff.user.email,
+        "staff_name" : staff.user.name,
+        "staff_number" : staff.phone_number,
+        "staff" : True,
+         }
+    else:
+        response_data = {
+            "session-id": request.session.session_key,
+            "email": user.email,
+            "name": user.name,
+            "disability" : user.disability,
+            'user_picture': json.dumps(str(user.image.url)) if user.image.url else None,
+            "has_chose" : user.has_chose,
+            "staff" : False,
+        }
+    listkosong.append(response_data)
     return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def flutter_edit_user(request):
+    if request.method == "POST":
+        data = request.body.decode("utf-8")
+        cleaned_data = json.loads(data)
+        session_id = cleaned_data.get('session_id')
+        engine = import_module(settings.SESSION_ENGINE)
+        sessionstore = engine.SessionStore
+        session = sessionstore(session_id)
+        email = session.get('_auth_user_id')
+        user = Account.objects.get(email=email)
+        user.name = cleaned_data.get('name')
+        user.disability = cleaned_data.get('disability')
+        user.save()
+        return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
+    
+@csrf_exempt
+def confirm_user(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    email_user = request.GET.get('email')
+    user = Account.objects.get(email=email)
+    staffUser = StaffProfile.objects.get(user=user)
+    userRequest = Account.objects.get(email=email_user)
+    staffConfirm = StaffAssistant.objects.get(staff=staffUser, user=userRequest)
+    userRequest.staff_assistant = staffConfirm
+    userRequest.save()
+    staffUser.is_available = False
+    staffUser.save()
+    staffAll = StaffAssistant.objects.filter(staff=staffUser)
+    for i in staffAll:
+        if i.user != userRequest:
+            i.user.has_chose = False
+            i.user.has_chose.save()
+    # Delete StaffAssistant objects where user is not equal to userRequest
+    StaffAssistant.objects.exclude(user=userRequest, staff = staffUser).delete()
+    return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
+
+@csrf_exempt
+def info_staff(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    user = Account.objects.get(email=email)
+    staff = StaffProfile.objects.get(user = user)
+    if not StaffAssistant.objects.filter(staff=staff).exists():
+        response_data = {
+            "confirmed" : False,
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+        staffUser = StaffProfile.objects.get(user=user)
+        staffConfirm = StaffAssistant.objects.get(staff=staffUser)
+        if not staffUser.is_available:
+            response_data = {
+                "email": staffConfirm.user.name,
+                "name": staffConfirm.user.email,
+                "disability" : staffConfirm.user.disability,
+                'user_picture': json.dumps(str(staffConfirm.user.image.url)) if staffConfirm.user.image.url else None,
+                "confirmed" : True,
+            }
+        else:
+            response_data = {
+                "confirmed" : False,
+            }
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+
+
+
+
+
+    
+
+
+    
+
+    
+
+
 
 

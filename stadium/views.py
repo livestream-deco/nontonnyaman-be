@@ -17,6 +17,28 @@ FeatureFormSet = inlineformset_factory(
 )
 
 
+
+@csrf_exempt
+def list_request(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    owninguser = Account.objects.get(email = email)
+    staff = StaffProfile.objects.get(user = owninguser)
+    staffAssistantList = StaffAssistant.objects.filter(staff=staff)
+    userlist = []
+    for i in staffAssistantList :
+        user = i.user
+        userlist.append({
+        'name' : user.name,
+        'email' : user.email,
+        'disability' : user.disability
+        })
+    data = json.dumps(userlist)
+    return HttpResponse(data, content_type='application/json')
+
 def add_stadium(request):
     # if require_http_methods(["POST"]):
     #     context = {}
@@ -151,16 +173,19 @@ def staff_list(request):
         staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
     else:
         staff_list = Account.objects.filter(is_staff=True)
-    
-    # Create a list of dictionaries containing staff information
+
     staff_info_list = []
-    for staff in staff_list:
-        staff_info_list.append({
-            'staff_id': staff.id,
-            'name': staff.name,
-            'email': staff.email,
-            'stadium_name': staff.stadium.stadium_name if staff.stadium else None,
-        })
+    for i in staff_list:
+        if StaffProfile.objects.get(user = i, is_available = True):
+                staff = StaffProfile.objects.get(user = i, is_available = True)
+                staff_info_list.append({
+                    'staff_id': staff.staff_id,
+                    'name': i.name,
+                    'email': i.email,
+                    'stadium_name': staff.stadium if staff.stadium else None,
+                })
+
+    # Create a list of dictionaries containing staff information
     
     data = json.dumps(staff_info_list)
     return HttpResponse(data, content_type='application/json')
@@ -173,13 +198,19 @@ def pick_staff(request):
     session = sessionstore(session_id)
     email = session.get('_auth_user_id')
     owninguser = Account.objects.get(email = email)
+    owninguser.has_chose = True
+    owninguser.save()
     staff_id = request.GET.get('input_id')
     staff = StaffProfile.objects.get(staff_id = staff_id)
-    staff.is_available = False
     staffAssistant = StaffAssistant.objects.create(user=owninguser, staff=staff)
     staffAssistant.save()
-    staff.save()
     return JsonResponse({'isSuccessful':True},safe = False)
+
+
+    
+
+
+
 
 
 
