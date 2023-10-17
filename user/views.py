@@ -244,10 +244,10 @@ def flutter_edit_user(request):
         name = request.POST.get('name')
         disability = request.POST.get('disability')
         image = request.FILES.get('image')
+        user = Account.objects.get(email = email)
         if image is not None:
             file_path = default_storage.save(image.name, image)
             user.image = file_path
-        user = Account.objects.get(email = email)
         user.disability = disability
         user.name = name
 
