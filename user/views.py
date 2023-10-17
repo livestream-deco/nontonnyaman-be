@@ -111,6 +111,7 @@ def list_staff(request):
             'phone_number': i.phone_number,
             'stadium': i.stadium.stadium_name,
             'user': i.user.email,
+            'userpicture': json.dumps(str(i.user.image.url)) if i.user.image.url else None
         })
     data = json.dumps(list_staff)
     return HttpResponse(data, content_type='application/json')
@@ -171,6 +172,7 @@ def staff_detail(request):
         'phone_number': staff.phone_number,
         'stadium': staff.stadium.stadium_name,
         'user': staff.user.email,
+        'user_picture': json.dumps(str(staff.user.image.url)) if staff.user.image.url else None
     })
     data = json.dumps(staff_detail)
     return HttpResponse(data, content_type='application/json')
@@ -209,6 +211,7 @@ def flutter_get_user_info(request):
         "name": user.name,
         "disability" : user.disability,
         'user_picture': json.dumps(str(user.image.url)) if user.image.url else None,
+        "staff_picture": json.dumps(str(user.staff_assistant.staff.user.image.url)) if user.staff_assistant.staff.user.image.url else None,
         "has_chose" : user.has_chose,
         "staff_email" : staff.user.email,
         "staff_name" : staff.user.name,
@@ -231,18 +234,25 @@ def flutter_get_user_info(request):
 @csrf_exempt
 def flutter_edit_user(request):
     if request.method == "POST":
-        data = request.body.decode("utf-8")
-        cleaned_data = json.loads(data)
-        session_id = cleaned_data.get('session_id')
+        session_id = request.POST.get('session_id')
         engine = import_module(settings.SESSION_ENGINE)
         sessionstore = engine.SessionStore
         session = sessionstore(session_id)
-        email = session.get('_auth_user_id')
-        user = Account.objects.get(email=email)
-        user.name = cleaned_data.get('name')
-        user.disability = cleaned_data.get('disability')
+        email = session.get('_auth_user_id')   
+        print(email)
+        password = request.POST.get('password')
+        name = request.POST.get('name')
+        disability = request.POST.get('disability')
+        image = request.FILES.get('image')
+        if image is not None:
+            file_path = default_storage.save(image.name, image)
+            user.image = file_path
+        user = Account.objects.get(email = email)
+        user.disability = disability
+        user.name = name
+
         user.save()
-        return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
+        return JsonResponse({"session-id": request.session.session_key})
     
 @csrf_exempt
 def confirm_user(request):
@@ -286,6 +296,7 @@ def info_staff(request):
     else:
         staffUser = StaffProfile.objects.get(user=user)
         staffConfirm = StaffAssistant.objects.get(staff=staffUser)
+        print(staffConfirm.user.image)
         if not staffUser.is_available:
             response_data = {
                 "email": staffConfirm.user.name,
@@ -298,7 +309,26 @@ def info_staff(request):
             response_data = {
                 "confirmed" : False,
             }
+        
     return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+@csrf_exempt
+def decline_user(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    email_user = request.GET.get('email')
+    user = Account.objects.get(email=email)
+    staffUser = StaffProfile.objects.get(user=user)
+    userRequest = Account.objects.get(email=email_user)
+    staffConfirm = StaffAssistant.objects.get(staff=staffUser, user=userRequest)
+    staffConfirm.delete()
+    userRequest.has_chose = False
+    userRequest.save()
+    # Delete StaffAssistant objects where user is not equal to userRequest
+    return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
 
 
 

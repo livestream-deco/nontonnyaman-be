@@ -16,8 +16,6 @@ FeatureFormSet = inlineformset_factory(
     Stadium, StadiumFeature, form=FeatureForm, extra=1, can_delete=True
 )
 
-
-
 @csrf_exempt
 def list_request(request):
     session_id = request.GET.get('session_id')
@@ -34,7 +32,9 @@ def list_request(request):
         userlist.append({
         'name' : user.name,
         'email' : user.email,
-        'disability' : user.disability
+        'disability' : user.disability,
+        'user_picture': json.dumps(str(user.image.url)) if user.image else None,
+
         })
     data = json.dumps(userlist)
     return HttpResponse(data, content_type='application/json')

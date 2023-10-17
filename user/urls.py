@@ -12,5 +12,6 @@ urlpatterns = [
      path('user-info-detail/',flutter_user_info),
      path('confirm-user/',confirm_user),
      path('info-staff/',info_staff),
-     path('end-task/', end_task)
+     path('end-task/', end_task),
+     path('decline-user/', decline_user)
 ]
