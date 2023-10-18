@@ -38,6 +38,7 @@ def view_accomodation(request):
     accomodation_list = []
     for accom in accomodation:
         accomodation_list.append({
+            'accomodation_id' : accomodation.id,
             'accomodation_name' : accom.accomodation_name,
             'accomodation_description': accom.accomodation_description,
             'accomodation_price': accom.accomodation_price,
