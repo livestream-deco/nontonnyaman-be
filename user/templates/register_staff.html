@@ -1,0 +1,7 @@
+<!-- register_staff.html -->
+<form method="post">
+    {% csrf_token %}
+    {{ staff_form.as_p }}
+    <button type="submit">Register Staff</button>
+  </form>
+  

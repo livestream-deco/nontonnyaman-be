@@ -1,18 +1,43 @@
+from importlib import import_module
 import json
 from django.shortcuts import render,redirect
 from stadium.forms import StadiumForm,FeatureForm
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from stadium.models import Stadium,StadiumFeature
-from user.models import Account
+from user.models import *
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.forms.models import inlineformset_factory
+
 
 from django.shortcuts import get_object_or_404, render,HttpResponseRedirect
 FeatureFormSet = inlineformset_factory(
     Stadium, StadiumFeature, form=FeatureForm, extra=1, can_delete=True
 )
 
+@csrf_exempt
+def list_request(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    owninguser = Account.objects.get(email = email)
+    staff = StaffProfile.objects.get(user = owninguser)
+    staffAssistantList = StaffAssistant.objects.filter(staff=staff)
+    userlist = []
+    for i in staffAssistantList :
+        user = i.user
+        userlist.append({
+        'name' : user.name,
+        'email' : user.email,
+        'disability' : user.disability,
+        'user_picture': json.dumps(str(user.image.url)) if user.image else None,
+
+        })
+    data = json.dumps(userlist)
+    return HttpResponse(data, content_type='application/json')
 
 def add_stadium(request):
     # if require_http_methods(["POST"]):
@@ -108,7 +133,8 @@ def delete_stadium(request,id):
     return render(request, "delete_view.html", context)
 
 def staff_list(request, stadium_id):
-    selected_stadium = Stadium.objects.filter(id=stadium_id).first()
+    stadium_id = request.GET.get('input_id')
+    selected_stadium = Stadium.objects.get(id=stadium_id)
     
     if selected_stadium:
         staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
@@ -147,18 +173,44 @@ def staff_list(request):
         staff_list = Account.objects.filter(is_staff=True, stadium=selected_stadium)
     else:
         staff_list = Account.objects.filter(is_staff=True)
-    
-    # Create a list of dictionaries containing staff information
+
     staff_info_list = []
-    for staff in staff_list:
-        staff_info_list.append({
-            'staff_id': staff.id,
-            'name': staff.name,
-            'email': staff.email,
-            'stadium_name': staff.stadium.stadium_name if staff.stadium else None,
-        })
+    for i in staff_list:
+        if StaffProfile.objects.get(user = i, is_available = True):
+                staff = StaffProfile.objects.get(user = i, is_available = True)
+                staff_info_list.append({
+                    'staff_id': staff.staff_id,
+                    'name': i.name,
+                    'email': i.email,
+                    'stadium_name': staff.stadium if staff.stadium else None,
+                })
+
+    # Create a list of dictionaries containing staff information
     
     data = json.dumps(staff_info_list)
     return HttpResponse(data, content_type='application/json')
+
+@csrf_exempt
+def pick_staff(request):
+    session_id = request.GET.get('session_id')
+    engine = import_module(settings.SESSION_ENGINE)
+    sessionstore = engine.SessionStore
+    session = sessionstore(session_id)
+    email = session.get('_auth_user_id')
+    owninguser = Account.objects.get(email = email)
+    owninguser.has_chose = True
+    owninguser.save()
+    staff_id = request.GET.get('input_id')
+    staff = StaffProfile.objects.get(staff_id = staff_id)
+    staffAssistant = StaffAssistant.objects.create(user=owninguser, staff=staff)
+    staffAssistant.save()
+    return JsonResponse({'isSuccessful':True},safe = False)
+
+
+    
+
+
+
+
 
 

@@ -17,8 +17,9 @@ def add_accomodation(request):
         return render(request, 'add_accomodation.html', context)   
 
 @csrf_exempt
-def detail_accomodation(request, input_id):
+def detail_accomodation(request):
     accomodatio_id = request.GET.get('input_id')
+
     accomodation = Accomodation.objects.get(id=accomodatio_id)
     accomodation_list = []
     accomodation_list.append({
@@ -28,9 +29,8 @@ def detail_accomodation(request, input_id):
         'accomodation_price': accomodation.accomodation_price,
         'accomodation_picture': json.dumps(str(accomodation.accomodation_picture.url)) if accomodation.accomodation_picture else None,
     })
-    print(accomodation_list)
     data = json.dumps(accomodation_list)
-    return render(request, 'view_detail_accomodation.html', {'accomodation': accomodation_list})
+    return HttpResponse(data, content_type='application/json')
 
 @csrf_exempt
 def view_accomodation(request):
@@ -38,6 +38,7 @@ def view_accomodation(request):
     accomodation_list = []
     for accom in accomodation:
         accomodation_list.append({
+            'accomodation_id' : accom.id,
             'accomodation_name' : accom.accomodation_name,
             'accomodation_description': accom.accomodation_description,
             'accomodation_price': accom.accomodation_price,
@@ -45,6 +46,7 @@ def view_accomodation(request):
         })
     data = json.dumps(accomodation_list)
     return HttpResponse(data, content_type='application/json')
+
 
 def delete_accomodation(request,id):
     context = {}
