@@ -69,7 +69,7 @@ def view_detail_stadium(request):
     stadium_data = {
         'stadium_id' : stadium.id,
         'stadium_name' : stadium.stadium_name,
-        'stadium_location' : stadium.stadium_name,
+        'stadium_location' : stadium.stadium_location,
         'stadium_text': stadium.stadium_text,
         'stadium_picture': json.dumps(str(stadium.stadium_picture.url)) if stadium.stadium_picture else None,
         'stadium_map_picture': json.dumps(str(stadium.stadium_map_picture.url)) if stadium.stadium_map_picture else None,
