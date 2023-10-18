@@ -38,7 +38,7 @@ def view_accomodation(request):
     accomodation_list = []
     for accom in accomodation:
         accomodation_list.append({
-            'accomodation_id' : accomodation.id,
+            'accomodation_id' : accom.id,
             'accomodation_name' : accom.accomodation_name,
             'accomodation_description': accom.accomodation_description,
             'accomodation_price': accom.accomodation_price,
@@ -46,6 +46,7 @@ def view_accomodation(request):
         })
     data = json.dumps(accomodation_list)
     return HttpResponse(data, content_type='application/json')
+
 
 def delete_accomodation(request,id):
     context = {}
