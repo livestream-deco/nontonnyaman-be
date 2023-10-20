@@ -7,6 +7,7 @@ from accomodationsuggestion.models import Accomodation
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,HttpResponseRedirect
 
+## Function to add accomodation
 def add_accomodation(request):
     if require_http_methods(["POST"]):
         context = {}
@@ -16,6 +17,7 @@ def add_accomodation(request):
             context['form'] = AccomodationForm()
         return render(request, 'add_accomodation.html', context)   
 
+## Function to show detail accomodation
 @csrf_exempt
 def detail_accomodation(request):
     accomodatio_id = request.GET.get('input_id')
@@ -32,6 +34,7 @@ def detail_accomodation(request):
     data = json.dumps(accomodation_list)
     return HttpResponse(data, content_type='application/json')
 
+## Function to view accomodation
 @csrf_exempt
 def view_accomodation(request):
     accomodation = Accomodation.objects.all()
@@ -47,7 +50,7 @@ def view_accomodation(request):
     data = json.dumps(accomodation_list)
     return HttpResponse(data, content_type='application/json')
 
-
+## Function to delete accomodation
 def delete_accomodation(request,id):
     context = {}
     obj = get_object_or_404(Accomodation, id = id)

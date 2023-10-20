@@ -16,6 +16,7 @@ FeatureFormSet = inlineformset_factory(
     Stadium, StadiumFeature, form=FeatureForm, extra=1, can_delete=True
 )
 
+## Show the list of request
 @csrf_exempt
 def list_request(request):
     session_id = request.GET.get('session_id')
@@ -39,14 +40,8 @@ def list_request(request):
     data = json.dumps(userlist)
     return HttpResponse(data, content_type='application/json')
 
+## Function to add stadium 
 def add_stadium(request):
-    # if require_http_methods(["POST"]):
-    #     context = {}
-    #     context['form'] = StadiumForm(request.POST, request.FILES)
-    #     if context['form'].is_valid():
-    #         context['form'].save()
-    #         context['form'] = StadiumForm()
-    #     return render(request, 'stadium.html', context)
     if request.method == 'POST':
         form = StadiumForm(request.POST, request.FILES)
         if form.is_valid():
@@ -61,6 +56,7 @@ def add_stadium(request):
         feature_formset = FeatureFormSet()
     return render(request, 'stadium.html', {'form': form, 'feature_formset': feature_formset})
 
+## Function to show the stadium's detail
 @csrf_exempt
 def view_detail_stadium(request):
     stadium_id = request.GET.get('input_id')
@@ -74,14 +70,6 @@ def view_detail_stadium(request):
         'stadium_picture': json.dumps(str(stadium.stadium_picture.url)) if stadium.stadium_picture else None,
         'stadium_map_picture': json.dumps(str(stadium.stadium_map_picture.url)) if stadium.stadium_map_picture else None,
     }
-    # stadium_list = {
-    #     'stadium_id' : stadium.id,
-    #     'stadium_name' : stadium.stadium_name,
-    #     'stadium_location' : stadium.stadium_name,
-    #     'stadium_text': stadium.stadium_text,
-    #     'stadium_picture': str(stadium.stadium_picture.url) if stadium.stadium_picture else None,
-    #     'stadium_map_picture': str(stadium.stadium_map_picture.url) if stadium.stadium_map_picture else None,
-    # }    
     print(stadium_data["stadium_map_picture"])
     features_data = []
     for feature in stadium.features.all():
@@ -124,6 +112,7 @@ def view_all_stadium(request):
     data = json.dumps(stadium_list)
     return HttpResponse(data, content_type='application/json')
 
+## Function to delete stadium
 def delete_stadium(request,id):
     context ={}
     obj = get_object_or_404(Stadium, id = id) 
@@ -132,6 +121,7 @@ def delete_stadium(request,id):
         return HttpResponseRedirect("list/")   
     return render(request, "delete_view.html", context)
 
+## Function to show the staff_list
 def staff_list(request, stadium_id):
     stadium_id = request.GET.get('input_id')
     selected_stadium = Stadium.objects.get(id=stadium_id)
@@ -151,7 +141,7 @@ def staff_list(request, stadium_id):
     
     return render(request, 'staff_list.html', context)
 
-
+## Function to choose the stadium
 def choose_stadium(request):
     stadiums = Stadium.objects.all()
     
@@ -165,6 +155,7 @@ def choose_stadium(request):
     
     return render(request, 'choose_stadium.html', context)
 
+## Function to show the staff list
 def staff_list(request):
     stadium_id = request.GET.get('input_id')
     selected_stadium = Stadium.objects.get(id=stadium_id)
@@ -190,6 +181,7 @@ def staff_list(request):
     data = json.dumps(staff_info_list)
     return HttpResponse(data, content_type='application/json')
 
+## Function to pick staff
 @csrf_exempt
 def pick_staff(request):
     session_id = request.GET.get('session_id')

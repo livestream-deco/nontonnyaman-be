@@ -16,6 +16,9 @@ from stadium.models import Stadium
 from .forms import StaffRegistrationForm, StaffListForm, StaffChoiceForm  # Create this form in forms.py
 from django.core.files.storage import default_storage
 
+
+
+## This function is used to let the staff end task a user's assitance
 @csrf_exempt
 def end_task(request):
     session_id = request.GET.get('session_id')
@@ -23,6 +26,7 @@ def end_task(request):
     sessionstore = engine.SessionStore
     session = sessionstore(session_id)
     email = session.get('_auth_user_id')
+
     user = Account.objects.get(email=email)
     staffUser = StaffProfile.objects.get(user=user)
     staffConfirm = StaffAssistant.objects.get(staff=staffUser)
@@ -33,6 +37,7 @@ def end_task(request):
     staffConfirm.delete()
     return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
 
+## This function is used to register user
 @csrf_exempt
 def flutter_register_user(request):
     if request.method == "POST":
@@ -42,9 +47,6 @@ def flutter_register_user(request):
             name = request.POST.get('name')
             disability = request.POST.get('disability')
             image = request.FILES.get('image')
-            # You need to handle the image data appropriately based on your setup
-            # Here, I'm saving the uploaded file to Django's default storage
-            # and using its path to create the Account
             file_path = default_storage.save(image.name, image)
             image = request.FILES.get('image')
             if image is not None:
@@ -71,7 +73,8 @@ def flutter_register_user(request):
 
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
-
+        
+## This function is used for the user's login
 @csrf_exempt
 def flutter_user_login(request):
     if request.method == "POST":
@@ -95,8 +98,7 @@ def flutter_user_login(request):
         else:
             return JsonResponse({"error": "Invalid login credentials"})
         
-
-        
+## This function is used to show the list of staff        
 @csrf_exempt
 def list_staff(request):
     stadium_id = request.GET.get('input_id')
@@ -116,6 +118,7 @@ def list_staff(request):
     data = json.dumps(list_staff)
     return HttpResponse(data, content_type='application/json')
 
+## This function is used to register staff
 def register_staff(request):
     if request.method == 'POST':
         staff_form = StaffRegistrationForm(request.POST)
@@ -123,17 +126,17 @@ def register_staff(request):
         if staff_form.is_valid():
             staff_form.save()
 
-            # Optionally, set the 'has_chose' attribute to True for the associated Account
             selected_user = staff_form.cleaned_data['user']
             selected_user.has_chose = True
             selected_user.save()
 
-            return redirect('staff_list')  # Redirect to the staff list or a success page
+            return redirect('staff_list')  
     else:
         staff_form = StaffRegistrationForm()
 
     return render(request, 'register_staff.html', {'staff_form': staff_form})
 
+## This function is used to choose staff
 def choose_staff(request):
     session_id = request.GET.get('session_id')
     engine = import_module(settings.SESSION_ENGINE)
@@ -149,17 +152,7 @@ def choose_staff(request):
     staff.save()
     return JsonResponse({'isSuccessful':True},safe = False)
 
-def check_list(request):
-    staffassistant = Account.objects.get(email = "aldi8@gmail.com")
-    staff = StaffAssistant.objects.filter(staff = staffassistant )
-    list_staff = []
-    for i in staff.user:
-        list_staff.append({
-            i
-        })
-    data = json.dumps(list_staff)
-    return JsonResponse(data, safe=False)        
-
+## This function is used to show the staff detail
 @csrf_exempt
 def staff_detail(request):
     staff_id = request.GET.get('input_id')
@@ -177,6 +170,7 @@ def staff_detail(request):
     data = json.dumps(staff_detail)
     return HttpResponse(data, content_type='application/json')
 
+## This function is used to show the user info
 @csrf_exempt
 def flutter_user_info(request):
     emails = request.GET.get('email')
@@ -194,6 +188,7 @@ def flutter_user_info(request):
 
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+## This function is used to show the user info more detail
 @csrf_exempt
 def flutter_get_user_info(request):
     session_id = request.GET.get('session_id')
@@ -231,6 +226,7 @@ def flutter_get_user_info(request):
     listkosong.append(response_data)
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+## This function is used to edit the user's profile
 @csrf_exempt
 def flutter_edit_user(request):
     if request.method == "POST":
@@ -254,6 +250,7 @@ def flutter_edit_user(request):
         user.save()
         return JsonResponse({"session-id": request.session.session_key})
     
+## Function used to confirm user ( in assistan's pov)
 @csrf_exempt
 def confirm_user(request):
     session_id = request.GET.get('session_id')
@@ -279,6 +276,7 @@ def confirm_user(request):
     StaffAssistant.objects.exclude(user=userRequest, staff = staffUser).delete()
     return JsonResponse({"session-id": request.session.session_key, "email": user.email, "name": user.name})
 
+## Function is used to show the staff info
 @csrf_exempt
 def info_staff(request):
     session_id = request.GET.get('session_id')
@@ -312,6 +310,7 @@ def info_staff(request):
         
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+## Function is used to decline user's request assistance
 @csrf_exempt
 def decline_user(request):
     session_id = request.GET.get('session_id')

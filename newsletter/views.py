@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, render,HttpResponseRedirect
 
 from newsletter.models import Newsletter
 
+## Function to add newsletter
 def add_newsletter(request):
     if require_http_methods(["POST"]):
         context = {}
@@ -19,6 +20,7 @@ def add_newsletter(request):
             context['form'] = NewsletterForm()
         return render(request, 'newsletter.html', context)
 
+## Function to view detail newsletter
 @csrf_exempt
 def view_detail_newsletter(request):
     newsletter_id = request.GET.get('input_id')
@@ -33,6 +35,7 @@ def view_detail_newsletter(request):
     data = json.dumps(newsletter_list)
     return HttpResponse(data, content_type='application/json')
 
+## Function to view all newsletter
 @csrf_exempt
 def view_all_newsletter(request):
     newsletters = Newsletter.objects.all()
@@ -48,6 +51,7 @@ def view_all_newsletter(request):
     data = json.dumps(newsletter_list)
     return HttpResponse(data, content_type='application/json')
 
+## Function to delete newsletter
 def delete_newsletter(request,id):
     context ={}
     obj = get_object_or_404(Newsletter, id = id) 
