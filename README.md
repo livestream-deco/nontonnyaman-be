@@ -25,3 +25,13 @@ By utilising the venue accesibility, it will be expected to have a clearer way o
 Also, by implementing the customer homepage, it will show some informative information in the context of the events that are currently available in the selected stadium. There are some features that is included in this session, such as News Events Updates, Accommodation Suggestion, and also Accessible seating information.
 
 Then we determine that the majority of the customers will require assistance based on the brief we received. In order to meet those needs, we are considering establishing connections between individuals by asking staff members to accompany customers, ease their fear, and heighten their joy as they watch the Olympic Games. Included in this are the menu items for Food and Beverages, Require Staff Assistance, and Emergency Assistance.
+
+
+### List of Links
+
+- [Register Stadium](https://nonton-nyaman-cbfc2703b99d.herokuapp.com/stadium/add-stadium/)
+  - This link allows you to register a stadium into the database.
+
+- [Register Staff](https://nonton-nyaman-cbfc2703b99d.herokuapp.com/user/register-staff/)
+  - This link allows you to register staff into the corresponding stadium's database.
+
