@@ -46,4 +46,7 @@ In detail, we use `Django` as our backend framework and `Flutter` as our fronten
 
 - [Register Staff](https://nonton-nyaman-cbfc2703b99d.herokuapp.com/user/register-staff/)
   - This link allows you to register staff into the corresponding stadium's database.
+    
+- [Prototype Video](https://drive.google.com/file/d/1HyYmG7-X6ahRnmdYaVFehdnlFIzRVxrH/view?usp=share_link)
+  - This link allows you to learn how to use the NontonNyaman application.  
 
